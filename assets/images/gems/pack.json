@@ -1,0 +1,56 @@
+{
+  "preload": {
+    "files": [
+      {
+        "type": "image",
+        "key": "gem-1",
+        "url": "./assets/images/gems/gem-1.png"
+      },
+      {
+        "type": "image",
+        "key": "gem-2",
+        "url": "./assets/images/gems/gem-2.png"
+      },
+      {
+        "type": "image",
+        "key": "gem-3",
+        "url": "./assets/images/gems/gem-3.png"
+      },
+      {
+        "type": "image",
+        "key": "gem-4",
+        "url": "./assets/images/gems/gem-4.png"
+      },
+      {
+        "type": "image",
+        "key": "gem-5",
+        "url": "./assets/images/gems/gem-5.png"
+      },
+      {
+        "type": "image",
+        "key": "gem-6",
+        "url": "./assets/images/gems/gem-6.png"
+      },
+      {
+        "type": "image",
+        "key": "gem-7",
+        "url": "./assets/images/gems/gem-7.png"
+      },
+      {
+        "type": "image",
+        "key": "gem-8",
+        "url": "./assets/images/gems/gem-8.png"
+      },
+      {
+        "type": "image",
+        "key": "gem-9",
+        "url": "./assets/images/gems/gem-9.png"
+      },
+      {
+        "type": "image",
+        "key": "gem-10",
+        "url": "./assets/images/gems/gem-10.png"
+      }
+    ]
+  }
+}
