@@ -9,6 +9,7 @@ export default class PreloadScene extends Phaser.Scene {
     public preload(): void {
         this.cameras.main.setBackgroundColor(0xffffff)
         this.add.image(0, 0, 'background').setOrigin(0)
+
         this.createLoadingbar()
 
         this.load.on(
@@ -43,14 +44,21 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image('smoke-particle', './assets/images/particles/particle-2.png')
         this.load.image('golden-particle', './assets/images/particles/particle-3.png')
         this.load.image('glass-particle', './assets/images/particles/particle-4.png')
+        this.load.image('leaf-particle', './assets/images/particles/particle-5.png')
 
         this.load.image('progress-frame', './assets/images/progress-info/progress-frame.png')
         this.load.image('progress-body', './assets/images/progress-info/progress-body.png')
         this.load.image('progress-head', './assets/images/progress-info/progress-head.png')
         this.load.image('progress-tail', './assets/images/progress-info/progress-tail.png')
-        this.load.image('progress-milestone', './assets/images/progress-info/progress-milestone.png')
+        this.load.image(
+            'progress-milestone',
+            './assets/images/progress-info/progress-milestone.png'
+        )
         this.load.image('progress-score', './assets/images/progress-info/progress-score.png')
-        this.load.image('progress-achievement', './assets/images/progress-info/progress-achievement.png')
+        this.load.image(
+            'progress-achievement',
+            './assets/images/progress-info/progress-achievement.png'
+        )
     }
 
     public create(): void {

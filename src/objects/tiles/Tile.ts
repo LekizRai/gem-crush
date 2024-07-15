@@ -19,23 +19,25 @@ export default class Tile extends Phaser.GameObjects.Image {
         return this.explosionType
     }
 
-    public enableGlow(status: boolean): void {
-        if (status) {
-            this.postFX?.disable()
-            this.postFX?.setPadding(320)
-            const fx = this.postFX?.addGlow(0xffffff, 8, 0)
-            this.scene.tweens.add({
-                targets: fx,
-                outerStrength: 0,
-                duration: 500,
-                yoyo: true,
-                loop: -1,
-                ease: Phaser.Math.Easing.Sine.InOut
-            })
-            this.postFX?.disable()
-        } else {
-            this.postFX?.disable()
-        }
+    public addGlow(color: number): void {
+        const fx = this.postFX?.addGlow(color, 0, 0)
+        this.scene.tweens.add({
+            targets: fx,
+            outerStrength: 8,
+            // innerStrength: 8,
+            duration: 500,
+            yoyo: true,
+            loop: -1,
+            ease: Phaser.Math.Easing.Sine.InOut,
+        })
+        this.scene.tweens.add({
+            targets: this,
+            alpha: 0.8,
+            duration: 500,
+            yoyo: true,
+            loop: -1,
+            ease: Phaser.Math.Easing.Sine.InOut,
+        })
     }
 
     public doDestroyEffect(callback: () => void, x?: number, y?: number): Promise<void> {

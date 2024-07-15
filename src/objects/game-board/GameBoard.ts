@@ -392,12 +392,8 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                                 )
                             )
                         } else {
-                            mergedIntoTile.enableGlow(true)
+                            mergedIntoTile.addGlow(0xefe1bb)
                         }
-
-                        // if (tile.getExplostionType() != consts.MATCH_TYPES[0]) {
-                        //     this.doExplosion(promises, tile)
-                        // }
                     })
                     break
                 }
@@ -419,12 +415,8 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                                 )
                             )
                         } else {
-                            mergedIntoTile.enableGlow(true)
+                            mergedIntoTile.addGlow(0xefe1bb)
                         }
-
-                        // if (tile.getExplostionType() != consts.MATCH_TYPES[0]) {
-                        //     this.doExplosion(promises, tile)
-                        // }
                     })
                     break
                 }
@@ -446,42 +438,34 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                                 )
                             )
                         } else {
-                            mergedIntoTile.enableGlow(true)
+                            mergedIntoTile.addGlow(0xefe1bb)
                         }
-
-                        // if (tile.getExplostionType() != consts.MATCH_TYPES[0]) {
-                        //     this.doExplosion(promises, tile)
-                        // }
                     })
                     break
                 }
 
-                // Case explosion 4
-                case consts.MATCH_TYPES[4]: {
-                    const mergedIntoTile: Tile = matchTypes[i].getMergedIntoTile()
-                    matchTypes[i].getTileList().forEach((tile: Tile) => {
-                        const tileI = utils.y2i(tile.y)
-                        const tileJ = utils.x2j(tile.x)
-                        if (tile != mergedIntoTile) {
-                            promises.push(
-                                tile.doDestroyEffect(
-                                    () => {
-                                        this.haveTile[tileI][tileJ] = false
-                                    },
-                                    mergedIntoTile.x,
-                                    mergedIntoTile.y
-                                )
-                            )
-                        } else {
-                            mergedIntoTile.enableGlow(true)
-                        }
-
-                        // if (tile.getExplostionType() != consts.MATCH_TYPES[0]) {
-                        //     this.doExplosion(promises, tile)
-                        // }
-                    })
-                    break
-                }
+                // // Case explosion 4
+                // case consts.MATCH_TYPES[4]: {
+                //     const mergedIntoTile: Tile = matchTypes[i].getMergedIntoTile()
+                //     matchTypes[i].getTileList().forEach((tile: Tile) => {
+                //         const tileI = utils.y2i(tile.y)
+                //         const tileJ = utils.x2j(tile.x)
+                //         if (tile != mergedIntoTile) {
+                //             promises.push(
+                //                 tile.doDestroyEffect(
+                //                     () => {
+                //                         this.haveTile[tileI][tileJ] = false
+                //                     },
+                //                     mergedIntoTile.x,
+                //                     mergedIntoTile.y
+                //                 )
+                //             )
+                //         } else {
+                //             mergedIntoTile.addGlow(0xefe1bb)
+                //         }
+                //     })
+                //     break
+                // }
             }
         }
 

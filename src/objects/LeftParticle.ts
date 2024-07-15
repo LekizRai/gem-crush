@@ -1,4 +1,4 @@
-export default class MyParticle extends Phaser.GameObjects.Particles.Particle {
+export default class LeftParticle extends Phaser.GameObjects.Particles.Particle {
     constructor(emitter: Phaser.GameObjects.Particles.ParticleEmitter) {
         super(emitter)
     }
