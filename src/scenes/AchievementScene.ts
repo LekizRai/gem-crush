@@ -2,6 +2,7 @@ import GameplayScene from './GameplayScene'
 
 export default class AchievementScene extends Phaser.Scene {
     private milestoneBoard: Phaser.GameObjects.Image
+    private achievementWord: Phaser.GameObjects.Text
 
     private test: Phaser.GameObjects.Particles.ParticleEmitter
 
@@ -19,12 +20,22 @@ export default class AchievementScene extends Phaser.Scene {
         this.waitingTime = 0
 
         this.milestoneBoard = this.add
-            .image(400, 500, 'progress-achievement')
-            .setScale(0.8)
+            .image(400, 600, 'progress-achievement')
+            .setScale(0.6)
             .setVisible(false)
+        this.achievementWord = this.add.text(270, 400, 'ACHIEVEMENT', {
+            fontFamily: 'garamond',
+            fontStyle: 'bold',
+            fontSize: 32,
+            color: '#efe1bb',
+        })
         this.scene.get('gameplay').events.on('milestoneachieved', () => {
             this.onWaiting = true
             this.milestoneBoard.setVisible(true)
+            const gameplayScene = this.scene.get('gameplay')
+            if (gameplayScene instanceof GameplayScene) {
+                gameplayScene.finish()
+            }
         })
     }
 

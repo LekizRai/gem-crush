@@ -88,8 +88,35 @@ export default class GameBoard extends Phaser.GameObjects.Container {
         }
     }
 
+    public finish(): void {
+        for (let i = 0; i < consts.GRID_HEIGHT; i++) {
+            for (let j = 0; j < consts.GRID_WIDTH; j++) {
+                this.scene.tweens.killTweensOf(this.tileGrid[i][j])
+                this.tileGrid[i][j].setScale(1)
+                this.scene.add.tween({
+                    targets: this.tileGrid[i][j],
+                    x: 346,
+                    y: 346,
+                    delay: (i * 8 + j) * 20,
+                    duration: 500,
+                    onComplete: () => {
+                        this.tileGrid[i][j].destroy()
+                        this.haveTile[i][j] = false
+                    },
+                })
+            }
+        }
+    }
+
     public restart(): void {
-        this.reset()
+        for (let i = 0; i < consts.GRID_HEIGHT; i++) {
+            for (let j = 0; j < consts.GRID_WIDTH; j++) {
+                this.tilePosition[i][j] = { x: utils.j2x(j), y: utils.i2y(i) }
+                this.tileGrid[i][j] = this.tileFactory.createRandomTile(utils.j2x(j), utils.i2y(i))
+                this.haveTile[i][j] = true
+                this.add(this.tileGrid[i][j])
+            }
+        }
         this.doRandomShuffle()
     }
 
@@ -335,15 +362,14 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                 // Case explosion 0
                 case consts.MATCH_TYPES[0]: {
                     matchTypes[i].getTileList().forEach((tile: Tile) => {
+                        promises.push(
+                            tile.doDestroyEffect(() => {
+                                this.haveTile[utils.y2i(tile.y)][utils.x2j(tile.x)] = false
+                            })
+                        )
+
                         if (tile.getExplostionType() != consts.MATCH_TYPES[0]) {
                             this.doExplosion(promises, tile)
-                        }
-                        if (!tile.isTweening()) {
-                            promises.push(
-                                tile.doDestroyEffect(() => {
-                                    this.haveTile[utils.y2i(tile.y)][utils.x2j(tile.x)] = false
-                                })
-                            )
                         }
                     })
                     break
@@ -356,103 +382,104 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                         const tileI = utils.y2i(tile.y)
                         const tileJ = utils.x2j(tile.x)
                         if (tile != mergedIntoTile) {
-                            if (!tile.isTweening()) {
-                                promises.push(
-                                    tile.doDestroyEffect(
-                                        () => {
-                                            this.haveTile[tileI][tileJ] = false
-                                        },
-                                        mergedIntoTile.x,
-                                        mergedIntoTile.y
-                                    )
+                            promises.push(
+                                tile.doDestroyEffect(
+                                    () => {
+                                        this.haveTile[tileI][tileJ] = false
+                                    },
+                                    mergedIntoTile.x,
+                                    mergedIntoTile.y
                                 )
-                            }
+                            )
                         } else {
-                            mergedIntoTile.preFX?.setPadding(32)
-                            mergedIntoTile.preFX?.addGlow()
+                            mergedIntoTile.enableGlow(true)
                         }
+
+                        // if (tile.getExplostionType() != consts.MATCH_TYPES[0]) {
+                        //     this.doExplosion(promises, tile)
+                        // }
                     })
                     break
                 }
 
                 // Case explosion 2
                 case consts.MATCH_TYPES[2]: {
-                    // const mergedIntoTile: Tile = matchTypes[i].getMergedIntoTile()
-                    // matchTypes[i].getTileList().forEach((tile: Tile) => {
-                    //     if (tile.getExplostionType() != consts.MATCH_TYPES[0]) {
-                    //         this.doExplosion(promises, tile)
-                    //     }
-                    //     const tileI = utils.y2i(tile.y)
-                    //     const tileJ = utils.x2j(tile.x)
-                    //     if (tile != mergedIntoTile) {
-                    //         promises.push(
-                    //             tile.doDestroyEffect(
-                    //                 () => {
-                    //                     this.haveTile[tileI][tileJ] = false
-                    //                 },
-                    //                 mergedIntoTile.x,
-                    //                 mergedIntoTile.y
-                    //             )
-                    //         )
-                    //     } else {
-                    //         mergedIntoTile.preFX?.setPadding(32)
-                    //         mergedIntoTile.preFX?.addGlow()
-                    //     }
-                    // })
+                    const mergedIntoTile: Tile = matchTypes[i].getMergedIntoTile()
+                    matchTypes[i].getTileList().forEach((tile: Tile) => {
+                        const tileI = utils.y2i(tile.y)
+                        const tileJ = utils.x2j(tile.x)
+                        if (tile != mergedIntoTile) {
+                            promises.push(
+                                tile.doDestroyEffect(
+                                    () => {
+                                        this.haveTile[tileI][tileJ] = false
+                                    },
+                                    mergedIntoTile.x,
+                                    mergedIntoTile.y
+                                )
+                            )
+                        } else {
+                            mergedIntoTile.enableGlow(true)
+                        }
+
+                        // if (tile.getExplostionType() != consts.MATCH_TYPES[0]) {
+                        //     this.doExplosion(promises, tile)
+                        // }
+                    })
                     break
                 }
 
                 // Case explosion 3
                 case consts.MATCH_TYPES[3]: {
-                    // const mergedIntoTile: Tile = matchTypes[i].getMergedIntoTile()
-                    // matchTypes[i].getTileList().forEach((tile: Tile) => {
-                    //     if (tile.getExplostionType() != consts.MATCH_TYPES[0]) {
-                    //         this.doExplosion(promises, tile)
-                    //     }
-                    //     const tileI = utils.y2i(tile.y)
-                    //     const tileJ = utils.x2j(tile.x)
-                    //     if (tile != mergedIntoTile) {
-                    //         promises.push(
-                    //             tile.doDestroyEffect(
-                    //                 () => {
-                    //                     this.haveTile[tileI][tileJ] = false
-                    //                 },
-                    //                 mergedIntoTile.x,
-                    //                 mergedIntoTile.y
-                    //             )
-                    //         )
-                    //     } else {
-                    //         mergedIntoTile.preFX?.setPadding(32)
-                    //         mergedIntoTile.preFX?.addGlow()
-                    //     }
-                    // })
+                    const mergedIntoTile: Tile = matchTypes[i].getMergedIntoTile()
+                    matchTypes[i].getTileList().forEach((tile: Tile) => {
+                        const tileI = utils.y2i(tile.y)
+                        const tileJ = utils.x2j(tile.x)
+                        if (tile != mergedIntoTile) {
+                            promises.push(
+                                tile.doDestroyEffect(
+                                    () => {
+                                        this.haveTile[tileI][tileJ] = false
+                                    },
+                                    mergedIntoTile.x,
+                                    mergedIntoTile.y
+                                )
+                            )
+                        } else {
+                            mergedIntoTile.enableGlow(true)
+                        }
+
+                        // if (tile.getExplostionType() != consts.MATCH_TYPES[0]) {
+                        //     this.doExplosion(promises, tile)
+                        // }
+                    })
                     break
                 }
 
                 // Case explosion 4
                 case consts.MATCH_TYPES[4]: {
-                    // const mergedIntoTile: Tile = matchTypes[i].getMergedIntoTile()
-                    // matchTypes[i].getTileList().forEach((tile: Tile) => {
-                    //     if (tile.getExplostionType() != consts.MATCH_TYPES[0]) {
-                    //         this.doExplosion(promises, tile)
-                    //     }
-                    //     const tileI = utils.y2i(tile.y)
-                    //     const tileJ = utils.x2j(tile.x)
-                    //     if (tile != mergedIntoTile) {
-                    //         promises.push(
-                    //             tile.doDestroyEffect(
-                    //                 () => {
-                    //                     this.haveTile[tileI][tileJ] = false
-                    //                 },
-                    //                 mergedIntoTile.x,
-                    //                 mergedIntoTile.y
-                    //             )
-                    //         )
-                    //     } else {
-                    //         mergedIntoTile.preFX?.setPadding(32)
-                    //         mergedIntoTile.preFX?.addGlow()
-                    //     }
-                    // })
+                    const mergedIntoTile: Tile = matchTypes[i].getMergedIntoTile()
+                    matchTypes[i].getTileList().forEach((tile: Tile) => {
+                        const tileI = utils.y2i(tile.y)
+                        const tileJ = utils.x2j(tile.x)
+                        if (tile != mergedIntoTile) {
+                            promises.push(
+                                tile.doDestroyEffect(
+                                    () => {
+                                        this.haveTile[tileI][tileJ] = false
+                                    },
+                                    mergedIntoTile.x,
+                                    mergedIntoTile.y
+                                )
+                            )
+                        } else {
+                            mergedIntoTile.enableGlow(true)
+                        }
+
+                        // if (tile.getExplostionType() != consts.MATCH_TYPES[0]) {
+                        //     this.doExplosion(promises, tile)
+                        // }
+                    })
                     break
                 }
             }
@@ -809,7 +836,8 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                     })
                 )
             }
-        } else if (tile.getExplostionType() == consts.MATCH_TYPES[3]) {
+        } // Do vertical explosion
+        else if (tile.getExplostionType() == consts.MATCH_TYPES[3]) {
             for (let i = 0; i < consts.GRID_HEIGHT; i++) {
                 promises.push(
                     this.tileGrid[i][tileJ].doDestroyEffect(() => {
@@ -817,7 +845,8 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                     })
                 )
             }
-        } else if (tile.getExplostionType() == consts.MATCH_TYPES[4]) {
+        } // Do random explosion
+        else if (tile.getExplostionType() == consts.MATCH_TYPES[4]) {
             let idList: number[] = []
             for (let i = 0; i < 64; i++) {
                 idList.push(i)

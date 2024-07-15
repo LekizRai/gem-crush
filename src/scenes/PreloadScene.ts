@@ -6,7 +6,7 @@ export default class PreloadScene extends Phaser.Scene {
         super('preload')
     }
 
-    preload(): void {
+    public preload(): void {
         this.cameras.main.setBackgroundColor(0xffffff)
         this.add.image(0, 0, 'background').setOrigin(0)
         this.createLoadingbar()
@@ -35,8 +35,6 @@ export default class PreloadScene extends Phaser.Scene {
             this
         )
 
-        this.load.image('background', './assets/images/backgrounds/background.png')
-
         this.load.pack('preload', './assets/images/gems/pack.json', 'preload')
         this.load.image('ground', './assets/images/grounds/ground.png')
         this.load.image('selection', './assets/images/selection-frames/selection-frame.png')
@@ -55,7 +53,7 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image('progress-achievement', './assets/images/progress-info/progress-achievement.png')
     }
 
-    create(): void {
+    public create(): void {
         this.scene.start('gameplay')
     }
 

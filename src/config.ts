@@ -1,8 +1,9 @@
+import InitScene from './scenes/InitScene'
 import PreloadScene from './scenes/PreloadScene'
 import GameplayScene from './scenes/GameplayScene'
 import AchievementScene from './scenes/AchievementScene'
 
-export const GameConfig: Phaser.Types.Core.GameConfig = {
+const gameConfig: Phaser.Types.Core.GameConfig = {
     title: 'Candy crush',
     url: 'https://github.com/digitsensitive/phaser3-typescript',
     version: '0.0.1',
@@ -14,7 +15,9 @@ export const GameConfig: Phaser.Types.Core.GameConfig = {
         autoCenter: Phaser.Scale.CENTER_BOTH,
     },
     parent: 'game',
-    scene: [PreloadScene, GameplayScene, AchievementScene],
+    scene: [InitScene, PreloadScene, GameplayScene, AchievementScene],
     backgroundColor: '#de3412',
     render: { pixelArt: false, antialias: true },
 }
+
+export default gameConfig

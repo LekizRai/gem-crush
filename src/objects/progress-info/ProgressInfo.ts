@@ -30,7 +30,7 @@ export default class ProgressBar extends Phaser.GameObjects.Container {
         this.add(this.progressHead)
         this.add(this.progressTail)
         this.add(this.progressBody)
-        this.add(this.progressParticleEmitter)
+        // this.add(this.progressParticleEmitter)
         this.add(this.progressScoreFrame)
         this.add(this.progressScore)
         this.add(this.milestoneBoard)
@@ -53,7 +53,7 @@ export default class ProgressBar extends Phaser.GameObjects.Container {
                 duration: 200,
                 onUpdate: () => {
                     this.progressTail.setX(15 + this.progressBody.displayWidth)
-                    this.progressParticleEmitter.setX(26 + this.progressBody.displayWidth)
+                    // this.progressParticleEmitter.setX(26 + this.progressBody.displayWidth)
                     this.progressScore.setText(String(this.currentScore))
                     this.progressScore.setX(275 - this.progressScore.displayWidth / 2)
                 },
@@ -74,15 +74,15 @@ export default class ProgressBar extends Phaser.GameObjects.Container {
             .image(16, 140, 'progress-body')
             .setScale(0, 1)
             .setOrigin(0)
-        this.progressParticleEmitter = this.scene.add.particles(24, 0, 'smoke-particle', {
-            y: { min: 145, max: 177 },
-            lifespan: 200,
-            speed: { min: 100, max: 150 },
-            angle: { min: 100, max: 250 },
-            scale: { start: 0.8, end: 0 },
-            gravityY: 150,
-            blendMode: 'ADD',
-        })
+        // this.progressParticleEmitter = this.scene.add.particles(24, 0, 'smoke-particle', {
+        //     y: { min: 145, max: 177 },
+        //     lifespan: 200,
+        //     speed: { min: 100, max: 150 },
+        //     angle: { min: 100, max: 250 },
+        //     scale: { start: 0.8, end: 0 },
+        //     gravityY: 150,
+        //     blendMode: 'ADD',
+        // })
         this.progressScoreFrame = this.scene.add.image(100, 220, 'progress-score').setOrigin(0)
         this.progressScore = this.scene.add.text(120, 230, String(this.currentScore), {
             fontFamily: 'garamond',
@@ -116,14 +116,14 @@ export default class ProgressBar extends Phaser.GameObjects.Container {
         this.milestoneScore.setX(1020 - this.milestoneScore.displayWidth / 2)
     }
 
-    public restart(): void {
+    public finish(): void {
         this.scene.add.tween({
             targets: this.progressBody,
             scaleX: 0,
             duration: 1000,
             onUpdate: () => {
                 this.progressTail.setX(15 + this.progressBody.displayWidth)
-                this.progressParticleEmitter.setX(26 + this.progressBody.displayWidth)
+                // this.progressParticleEmitter.setX(26 + this.progressBody.displayWidth)
                 this.progressScore.setText(
                     String(Math.floor((this.scaleX / 2.085) * this.currentScore))
                 )
@@ -132,15 +132,18 @@ export default class ProgressBar extends Phaser.GameObjects.Container {
             },
             onComplete: () => {
                 this.currentScore = 0
-                this.currentMilestoneId += 1
-                if (this.currentMilestoneId >= 10) {
-                    this.currentMilestoneId = 0
-                }
-                this.milestoneScore.setText(String(consts.MILESTONES[this.currentMilestoneId]))
-                this.milestoneScore.setX(1020 - this.milestoneScore.displayWidth / 2)
                 this.progressScore.setText(String(this.currentScore))
                 this.progressScore.setX(275 - this.progressScore.displayWidth / 2)
             },
         })
+    }
+
+    public restart(): void {
+        this.currentMilestoneId += 1
+        if (this.currentMilestoneId >= 10) {
+            this.currentMilestoneId = 0
+        }
+        this.milestoneScore.setText(String(consts.MILESTONES[this.currentMilestoneId]))
+        this.milestoneScore.setX(1020 - this.milestoneScore.displayWidth / 2)
     }
 }

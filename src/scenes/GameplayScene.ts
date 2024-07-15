@@ -42,6 +42,11 @@ export default class GameplayScene extends Phaser.Scene {
         this.gameBoard.update(time, timeInterval)
     }
 
+    public finish(): void {
+        this.gameBoard.finish()
+        this.progressInfo.finish()
+    }
+
     public restart(): void {
         this.gameBoard.restart()
         this.progressInfo.restart()

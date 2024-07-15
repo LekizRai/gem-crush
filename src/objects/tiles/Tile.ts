@@ -19,8 +19,27 @@ export default class Tile extends Phaser.GameObjects.Image {
         return this.explosionType
     }
 
+    public enableGlow(status: boolean): void {
+        if (status) {
+            this.postFX?.disable()
+            this.postFX?.setPadding(320)
+            const fx = this.postFX?.addGlow(0xffffff, 8, 0)
+            this.scene.tweens.add({
+                targets: fx,
+                outerStrength: 0,
+                duration: 500,
+                yoyo: true,
+                loop: -1,
+                ease: Phaser.Math.Easing.Sine.InOut
+            })
+            this.postFX?.disable()
+        } else {
+            this.postFX?.disable()
+        }
+    }
+
     public doDestroyEffect(callback: () => void, x?: number, y?: number): Promise<void> {
-        // if (this.isTweening()) {
+        if (!this.isTweening()) {
             this.scene.events.emit('tiledestroyed', 25)
             if (x && y) {
                 return new Promise((resolve) => {
@@ -65,8 +84,8 @@ export default class Tile extends Phaser.GameObjects.Image {
                     },
                 })
             })
-        // }
-        // return new Promise((resolve) => {})
+        }
+        return Promise.resolve()
     }
 
     private addBurstingParticle(): void {
