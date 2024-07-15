@@ -30,7 +30,7 @@ export default class AchievementScene extends Phaser.Scene {
 
     public update(time: number, timeInterval: number): void {
         if (this.onWaiting) {
-            if (this.waitingTime > 3000) {
+            if (this.waitingTime > 2000) {
                 this.waitingTime = 0
                 this.onWaiting = false
                 this.milestoneBoard.setVisible(false)

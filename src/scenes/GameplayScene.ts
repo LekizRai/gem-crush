@@ -1,5 +1,7 @@
 import GameBoard from '../objects/game-board/GameBoard'
+import MyParticle from '../objects/MyParticle'
 import ProgressInfo from '../objects/progress-info/ProgressInfo'
+import Tile from '../objects/tiles/Tile'
 
 export default class GameplayScene extends Phaser.Scene {
     private gameBoard: GameBoard
@@ -20,21 +22,20 @@ export default class GameplayScene extends Phaser.Scene {
         this.scene.launch('achievement')
 
         this.test = this.add.particles(0, 500, 'particle', {
-            
+            particleClass: MyParticle,
             lifespan: 10000,
-            angle: { min: -60, max: -45 },
-            speed: { min: 100, max: 300 },
-            gravityY: 300,
+            angle: { min: -60, max: -30 },
+            speed: { min: 1000, max: 2000 },
+            rotate: { min: 0, max: 360 },
+            gravityY: 3000,
+            gravityX: -3000,
             scale: { start: 1, end: 1 },
             emitting: false,
             emitCallback: (particle: Phaser.GameObjects.Particles.Particle) => {
                 console.log(particle)
             },
         })
-        this.test.explode(5)
-        this.events.on('gravityoff', () => {
-            this.test.setParticleGravity(0, 0)
-        })
+        this.test.explode(30)
     }
 
     public update(time: number, timeInterval: number): void {

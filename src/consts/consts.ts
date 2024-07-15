@@ -18,6 +18,7 @@ const consts = {
         'gem-10',
     ],
     MATCH_TYPES: ['0', '4', '5', '5T', '5L'],
+    MILESTONES: [1000, 2000, 5000, 10000, 15000, 20000, 30000, 50000, 75000, 100000],
 }
 
 export default consts

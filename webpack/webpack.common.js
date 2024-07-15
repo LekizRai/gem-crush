@@ -34,7 +34,7 @@ module.exports = {
         },
     },
     plugins: [
-        new HtmlWebpackPlugin({ gameName: 'Candy Crush 2.0', template: 'index.html' }),
+        new HtmlWebpackPlugin({ gameName: 'Gem Crush', template: 'index.html' }),
         new CopyWebpackPlugin({
             patterns: [
                 { from: 'assets', to: 'assets' },

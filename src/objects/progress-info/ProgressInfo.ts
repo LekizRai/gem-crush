@@ -1,3 +1,5 @@
+import consts from '../../consts/consts'
+
 export default class ProgressBar extends Phaser.GameObjects.Container {
     private progressFrame: Phaser.GameObjects.Image
     private progressBody: Phaser.GameObjects.Image
@@ -12,14 +14,14 @@ export default class ProgressBar extends Phaser.GameObjects.Container {
     private milestoneScore: Phaser.GameObjects.Text
 
     private currentScore: number
-    private currentMilestone: number
+    private currentMilestoneId: number
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y)
         scene.add.existing(this)
 
         this.currentScore = 0
-        this.currentMilestone = 1000
+        this.currentMilestoneId = 0
 
         this.initProgressBar()
         this.initMilestoneBoard()
@@ -39,23 +41,25 @@ export default class ProgressBar extends Phaser.GameObjects.Container {
     private initProgressBar(): void {
         this.scene.events.on('tiledestroyed', (value: number) => {
             let isDone: boolean = false
-            if (this.currentScore + value >= this.currentMilestone) {
+            if (this.currentScore + value >= consts.MILESTONES[this.currentMilestoneId]) {
                 isDone = true
-                this.currentScore = this.currentMilestone
+                this.currentScore = consts.MILESTONES[this.currentMilestoneId]
             } else {
                 this.currentScore += value
             }
             this.scene.add.tween({
                 targets: this.progressBody,
-                scaleX: (this.currentScore / this.currentMilestone) * 2.085,
+                scaleX: (this.currentScore / consts.MILESTONES[this.currentMilestoneId]) * 2.085,
                 duration: 200,
                 onUpdate: () => {
                     this.progressTail.setX(15 + this.progressBody.displayWidth)
-                    this.progressScore.setX(275 - this.progressScore.displayWidth / 2)
                     this.progressParticleEmitter.setX(26 + this.progressBody.displayWidth)
+                    this.progressScore.setText(String(this.currentScore))
+                    this.progressScore.setX(275 - this.progressScore.displayWidth / 2)
                 },
                 onComplete: () => {
                     this.progressScore.setText(String(this.currentScore))
+                    this.progressScore.setX(275 - this.progressScore.displayWidth / 2)
                     if (isDone) {
                         this.scene.events.emit('milestoneachieved')
                     }
@@ -98,14 +102,45 @@ export default class ProgressBar extends Phaser.GameObjects.Container {
             color: '#efe1bb',
         })
 
-        this.milestoneScore = this.scene.add.text(0, 160, String(this.currentMilestone), {
-            fontFamily: 'garamond',
-            fontStyle: 'bold',
-            fontSize: 100,
-            color: '#efe1bb',
-        })
+        this.milestoneScore = this.scene.add.text(
+            0,
+            160,
+            String(consts.MILESTONES[this.currentMilestoneId]),
+            {
+                fontFamily: 'garamond',
+                fontStyle: 'bold',
+                fontSize: 100,
+                color: '#efe1bb',
+            }
+        )
         this.milestoneScore.setX(1020 - this.milestoneScore.displayWidth / 2)
     }
 
-    public restart(): void {}
+    public restart(): void {
+        this.scene.add.tween({
+            targets: this.progressBody,
+            scaleX: 0,
+            duration: 1000,
+            onUpdate: () => {
+                this.progressTail.setX(15 + this.progressBody.displayWidth)
+                this.progressParticleEmitter.setX(26 + this.progressBody.displayWidth)
+                this.progressScore.setText(
+                    String(Math.floor((this.scaleX / 2.085) * this.currentScore))
+                )
+                this.currentScore = Math.floor((this.scaleX / 2.085) * this.currentScore)
+                this.progressScore.setX(275 - this.progressScore.displayWidth / 2)
+            },
+            onComplete: () => {
+                this.currentScore = 0
+                this.currentMilestoneId += 1
+                if (this.currentMilestoneId >= 10) {
+                    this.currentMilestoneId = 0
+                }
+                this.milestoneScore.setText(String(consts.MILESTONES[this.currentMilestoneId]))
+                this.milestoneScore.setX(1020 - this.milestoneScore.displayWidth / 2)
+                this.progressScore.setText(String(this.currentScore))
+                this.progressScore.setX(275 - this.progressScore.displayWidth / 2)
+            },
+        })
+    }
 }
