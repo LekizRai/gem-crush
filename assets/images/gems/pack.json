@@ -35,21 +35,6 @@
         "type": "image",
         "key": "gem-7",
         "url": "./assets/images/gems/gem-7.png"
-      },
-      {
-        "type": "image",
-        "key": "gem-8",
-        "url": "./assets/images/gems/gem-8.png"
-      },
-      {
-        "type": "image",
-        "key": "gem-9",
-        "url": "./assets/images/gems/gem-9.png"
-      },
-      {
-        "type": "image",
-        "key": "gem-10",
-        "url": "./assets/images/gems/gem-10.png"
       }
     ]
   }
