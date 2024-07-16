@@ -16,10 +16,10 @@ export default class TileFactory {
             texture: consts.TILE_TYPES[id],
         })
     }
-
+ 
     public createRandomTile(x: number, y: number): Tile {
         const tileType: string =
-            consts.TILE_TYPES[Phaser.Math.RND.between(0, consts.TILE_TYPES.length - 1)]
+            consts.TILE_TYPES[Phaser.Math.RND.between(0, consts.TILE_TYPES.length - 5)]
 
         return new Tile({
             scene: this.scene,

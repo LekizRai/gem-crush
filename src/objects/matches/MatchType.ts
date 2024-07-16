@@ -11,12 +11,8 @@ export default class MatchType {
         this.mergedIntoTile = mergedIntoTile
         if (type) {
             this.type = type
-            this.mergedIntoTile.setExplosionType(this.type)
         } else {
             this.type = this.calcMatchType()
-            if (this.mergedIntoTile.getExplostionType() == consts.MATCH_TYPES[0]) {
-                this.mergedIntoTile.setExplosionType(this.type)
-            }
         }
     }
 
@@ -56,14 +52,16 @@ export default class MatchType {
             const sum: number =
                 directionList[0] + directionList[1] + directionList[2] + directionList[3]
             if (sum == 4) {
-                return consts.MATCH_TYPES[3]
+                return consts.MATCH_TYPES[4]
             } else if (sum == 3) {
-                return consts.MATCH_TYPES[3]
+                return consts.MATCH_TYPES[4]
             } else if (sum == 2) {
-                if (directionList[0] + directionList[1] != 1) {
+                if (directionList[0] + directionList[1] == 2) {
+                    return consts.MATCH_TYPES[3]
+                } else if (directionList[2] + directionList[3] == 2) {
                     return consts.MATCH_TYPES[2]
                 } else {
-                    return consts.MATCH_TYPES[3]
+                    return consts.MATCH_TYPES[4]
                 }
             } else {
                 return consts.MATCH_TYPES[2]

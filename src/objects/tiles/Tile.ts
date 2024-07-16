@@ -19,6 +19,12 @@ export default class Tile extends Phaser.GameObjects.Image {
         return this.explosionType
     }
 
+    public setTileTexture(id: number): void {
+        if (id <= 6) {
+            this.setTexture(consts.TILE_TYPES[id])
+        }
+    }
+
     public addGlow(color: number): void {
         const fx = this.postFX?.addGlow(color, 0, 0)
         this.scene.tweens.add({
