@@ -122,16 +122,16 @@ export default class Tile extends Phaser.GameObjects.Image {
 
     private addBurstingParticle(delay: number): void {
         const emitter = this.scene.add.particles(this.x, this.y, 'particle', {
-            lifespan: 200,
+            lifespan: 400,
             speed: { min: 200, max: 400 },
-            scale: { start: 1, end: 1 },
+            scale: { start: 1, end: 0 },
             rotate: { min: 0, max: 360 },
             blendMode: 'ADD',
             emitting: false,
         })
         this.parentContainer.add(emitter)
         setTimeout(() => {
-            emitter.explode(40, 0, 0)
+            emitter.explode(50, 0, 0)
         }, delay)
     }
 

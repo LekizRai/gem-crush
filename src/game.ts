@@ -3,6 +3,7 @@
 - Normalize grid height, not using grid length
 - Using global emitter
 - Shuffle shape change
+- Drag inputs
 */
 
 import Phaser from 'phaser'
