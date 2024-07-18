@@ -1,3 +1,10 @@
+/*
+- Add consts to consts.ts file
+- Normalize grid height, not using grid length
+- Using global emitter
+- Shuffle shape change
+*/
+
 import Phaser from 'phaser'
 import gameConfig from './config'
 

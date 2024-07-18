@@ -36,32 +36,18 @@ export default class PreloadScene extends Phaser.Scene {
             this
         )
 
-        this.load.pack('preload', './assets/images/gems/pack.json', 'preload')
-        this.load.image('ground', './assets/images/grounds/ground.png')
-        this.load.image('selection', './assets/images/selection-frames/selection-frame.png')
+        this.load.audio('explosion', './assets/audios/explosion.mp3')
+        this.load.audio('victory', './assets/audios/victory.mp3')
+        this.load.audio('theme', './assets/audios/theme.mp3')
 
-        this.load.image('particle', './assets/images/particles/particle-1.png')
-        this.load.image('smoke-particle', './assets/images/particles/particle-2.png')
-        this.load.image('golden-particle', './assets/images/particles/particle-3.png')
-        this.load.image('glass-particle', './assets/images/particles/particle-4.png')
-        this.load.image('leaf-particle', './assets/images/particles/particle-5.png')
-
-        this.load.image('progress-frame', './assets/images/progress-info/progress-frame.png')
-        this.load.image('progress-body', './assets/images/progress-info/progress-body.png')
-        this.load.image('progress-head', './assets/images/progress-info/progress-head.png')
-        this.load.image('progress-tail', './assets/images/progress-info/progress-tail.png')
-        this.load.image(
-            'progress-milestone',
-            './assets/images/progress-info/progress-milestone.png'
-        )
-        this.load.image('progress-score', './assets/images/progress-info/progress-score.png')
-        this.load.image(
-            'progress-achievement',
-            './assets/images/progress-info/progress-achievement.png'
-        )
+        this.load.pack('preload', './assets/images/pack.json', 'preload')
     }
 
     public create(): void {
+        this.sound.add('explosion')
+        this.sound.add('victory')
+        this.sound.add('theme')
+        
         this.scene.start('gameplay')
     }
 

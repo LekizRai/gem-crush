@@ -20,6 +20,9 @@ const utils = {
     union: (arr1: Tile[], arr2: Tile[]) => {
         return Array.from(new Set([...arr1, ...arr2]))
     },
+    difference: (arr1: Tile[], arr2: Tile[]) => {
+        return arr1.filter(item => arr2.indexOf(item) < 0);
+    },
     shuffle: (arr: any[]) => {
         let currentIndex = arr.length
         while (currentIndex != 0) {
@@ -29,6 +32,11 @@ const utils = {
         }
         return arr
     },
+    explostionDelay: (tile1: Tile, tile2: Tile) => {
+        const distanceX = Math.abs(tile1.x - tile2.x)
+        const distanceY = Math.abs(tile1.y - tile2.y)
+        return Math.max(distanceX, distanceY) * 0.8
+    }
 }
 
 export default utils

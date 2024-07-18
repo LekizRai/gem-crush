@@ -35,7 +35,7 @@ export default class MatchType {
             }
         }
 
-        if (this.tileList.length >= 5) {
+        if (this.tileList.length >= 4) {
             // U, D, L, R
             let directionList: number[] = [0, 0, 0, 0]
             for (let i = 0; i < this.tileList.length; i++) {
@@ -51,24 +51,27 @@ export default class MatchType {
             }
             const sum: number =
                 directionList[0] + directionList[1] + directionList[2] + directionList[3]
-            if (sum == 4) {
-                return consts.MATCH_TYPES[4]
-            } else if (sum == 3) {
-                return consts.MATCH_TYPES[4]
-            } else if (sum == 2) {
-                if (directionList[0] + directionList[1] == 2) {
-                    return consts.MATCH_TYPES[3]
-                } else if (directionList[2] + directionList[3] == 2) {
-                    return consts.MATCH_TYPES[2]
-                } else {
+
+            if (this.tileList.length >= 5) {
+                if (sum == 4) {
                     return consts.MATCH_TYPES[4]
+                } else if (sum == 3) {
+                    return consts.MATCH_TYPES[4]
+                } else if (sum == 2) {
+                    if (directionList[0] + directionList[1] == 1) {
+                        return consts.MATCH_TYPES[4]
+                    } else {
+                        return consts.MATCH_TYPES[3]
+                    }
                 }
             } else {
-                return consts.MATCH_TYPES[2]
+                if (directionList[0] + directionList[1] == 2) {
+                    return consts.MATCH_TYPES[2]
+                } else {
+                    return consts.MATCH_TYPES[1]
+                }
             }
-        } else if (this.tileList.length >= 4) {
-            return consts.MATCH_TYPES[1]
-        } else if (this.tileList.length >= 3) {
+        } else {
             return consts.MATCH_TYPES[0]
         }
         return consts.MATCH_TYPES[0]

@@ -60,6 +60,7 @@ export default class GameBoard extends Phaser.GameObjects.Container {
 
         this.haveSpecialTile = false
 
+        this.onSwapping = true
         this.doRandomShuffle()
 
         this.firstSelectionFrame = this.scene.add.image(0, 0, 'selection').setVisible(false)
@@ -113,6 +114,8 @@ export default class GameBoard extends Phaser.GameObjects.Container {
     }
 
     public restart(): void {
+        this.onSwapping = true
+        this.scene.events.emit('prohibitscore')
         for (let i = 0; i < consts.GRID_HEIGHT; i++) {
             for (let j = 0; j < consts.GRID_WIDTH; j++) {
                 this.tilePosition[i][j] = { x: utils.j2x(j), y: utils.i2y(i) }
@@ -248,18 +251,10 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                 y: this.secondSelectedTile.y,
             }
 
-            if (
-                this.firstSelectedTile.getExplostionType() == consts.MATCH_TYPES[2] ||
-                this.firstSelectedTile.getExplostionType() == consts.MATCH_TYPES[3] ||
-                this.firstSelectedTile.getExplostionType() == consts.MATCH_TYPES[4]
-            ) {
+            if (this.firstSelectedTile.getExplostionType() == consts.MATCH_TYPES[4]) {
                 this.haveSpecialTile = true
             }
-            if (
-                this.secondSelectedTile.getExplostionType() == consts.MATCH_TYPES[2] ||
-                this.secondSelectedTile.getExplostionType() == consts.MATCH_TYPES[3] ||
-                this.secondSelectedTile.getExplostionType() == consts.MATCH_TYPES[4]
-            ) {
+            if (this.secondSelectedTile.getExplostionType() == consts.MATCH_TYPES[4]) {
                 this.haveSpecialTile = true
             }
 
@@ -298,7 +293,8 @@ export default class GameBoard extends Phaser.GameObjects.Container {
         } else {
             this.secondSwapping = true
             await this.swapTiles()
-            this.tileUp()
+            await this.tileUp()
+            this.scene.events.emit('allowscore')
             this.onSwapping = false
         }
     }
@@ -378,19 +374,12 @@ export default class GameBoard extends Phaser.GameObjects.Container {
     private async removeTile(matchTypes: MatchType[]): Promise<void> {
         let promises: Promise<void>[] = []
         if (this.firstSelectedTile && this.secondSelectedTile) {
-            console.log('GET IN')
             if (this.firstSelectedTile.texture) {
-                console.log('GO BOOM')
-                this.haveSpecialTile = true
+                this.haveSpecialTile = false
                 this.doMatchFiveExplosion(promises, this.firstSelectedTile)
             }
-            if (
-                this.secondSelectedTile.getExplostionType() == consts.MATCH_TYPES[2] ||
-                this.secondSelectedTile.getExplostionType() == consts.MATCH_TYPES[3] ||
-                this.secondSelectedTile.getExplostionType() == consts.MATCH_TYPES[4]
-            ) {
-                console.log('GO BOOM')
-                this.haveSpecialTile = true
+            if (this.secondSelectedTile.getExplostionType() == consts.MATCH_TYPES[4]) {
+                this.haveSpecialTile = false
                 this.doMatchFiveExplosion(promises, this.secondSelectedTile)
             }
         }
@@ -400,20 +389,21 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                 // Case explosion 0 - 3 tiles
                 case consts.MATCH_TYPES[0]: {
                     matchTypes[i].getTileList().forEach((tile: Tile) => {
+                        if (tile.getExplostionType() != consts.MATCH_TYPES[0]) {
+                            this.doExplosion(promises, tile)
+                        }
+                    })
+                    matchTypes[i].getTileList().forEach((tile: Tile) => {
                         promises.push(
                             tile.doDestroyEffect(() => {
                                 this.haveTile[utils.y2i(tile.y)][utils.x2j(tile.x)] = false
                             })
                         )
-
-                        if (tile.getExplostionType() != consts.MATCH_TYPES[0]) {
-                            this.doExplosion(promises, tile)
-                        }
                     })
                     break
                 }
 
-                // Case explosion 1 - 4 tiles
+                // Case explosion 1 - 4 horizontal tiles
                 case consts.MATCH_TYPES[1]: {
                     const mergedIntoTile: Tile = matchTypes[i].getMergedIntoTile()
                     matchTypes[i].getTileList().forEach((tile: Tile) => {
@@ -425,6 +415,7 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                                     () => {
                                         this.haveTile[tileI][tileJ] = false
                                     },
+                                    0,
                                     mergedIntoTile.x,
                                     mergedIntoTile.y
                                 )
@@ -437,7 +428,7 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                     break
                 }
 
-                // Case explosion 2 - 5 horizontal tiles
+                // Case explosion 2 - 4 vertical tiles
                 case consts.MATCH_TYPES[2]: {
                     const mergedIntoTile: Tile = matchTypes[i].getMergedIntoTile()
                     matchTypes[i].getTileList().forEach((tile: Tile) => {
@@ -449,20 +440,20 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                                     () => {
                                         this.haveTile[tileI][tileJ] = false
                                     },
+                                    0,
                                     mergedIntoTile.x,
                                     mergedIntoTile.y
                                 )
                             )
                         } else {
                             mergedIntoTile.setExplosionType(matchTypes[i].getMatchType())
-                            mergedIntoTile.setTileTexture(6)
                             mergedIntoTile.addGlow(0xffffff)
                         }
                     })
                     break
                 }
 
-                // Case explosion 3 - 5 vertical tiles
+                // Case explosion 3 - 5 straight tiles
                 case consts.MATCH_TYPES[3]: {
                     const mergedIntoTile: Tile = matchTypes[i].getMergedIntoTile()
                     matchTypes[i].getTileList().forEach((tile: Tile) => {
@@ -474,20 +465,20 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                                     () => {
                                         this.haveTile[tileI][tileJ] = false
                                     },
+                                    0,
                                     mergedIntoTile.x,
                                     mergedIntoTile.y
                                 )
                             )
                         } else {
                             mergedIntoTile.setExplosionType(matchTypes[i].getMatchType())
-                            mergedIntoTile.setTileTexture(6)
-                            mergedIntoTile.addGlow(0xffffff)
+                            mergedIntoTile.addGlow(0xff0000)
                         }
                     })
                     break
                 }
 
-                // Case explosion 4 - 5 special shape tiles
+                // Case explosion 4 - 5 special tiles
                 case consts.MATCH_TYPES[4]: {
                     const mergedIntoTile: Tile = matchTypes[i].getMergedIntoTile()
                     matchTypes[i].getTileList().forEach((tile: Tile) => {
@@ -499,6 +490,7 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                                     () => {
                                         this.haveTile[tileI][tileJ] = false
                                     },
+                                    0,
                                     mergedIntoTile.x,
                                     mergedIntoTile.y
                                 )
@@ -506,7 +498,7 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                         } else {
                             mergedIntoTile.setExplosionType(matchTypes[i].getMatchType())
                             mergedIntoTile.setTileTexture(6)
-                            mergedIntoTile.addGlow(0xff0000)
+                            mergedIntoTile.addGlow(0xffffff)
                         }
                     })
                     break
@@ -573,6 +565,7 @@ export default class GameBoard extends Phaser.GameObjects.Container {
 
         const matches: Tile[][] = []
         let haveChecked: boolean[] = []
+        let checkedTileList: Tile[] = []
 
         let groups: Tile[] = []
 
@@ -652,10 +645,14 @@ export default class GameBoard extends Phaser.GameObjects.Container {
         // Check for special 5 matching shape
         for (let i = 0; i < matches.length - 1; i++) {
             if (haveChecked[i]) continue
+            const firstMatch = utils.difference(matches[i], checkedTileList)
+            if (firstMatch.length < 3) continue
             for (let j = i + 1; j < matches.length; j++) {
                 if (haveChecked[j]) continue
-                const intersectMatch = utils.intersect(matches[i], matches[j])
-                const unionMatch = utils.union(matches[i], matches[j])
+                const secondMatch = utils.difference(matches[j], checkedTileList)
+                if (secondMatch.length < 3) continue
+                const intersectMatch = utils.intersect(firstMatch, secondMatch)
+                const unionMatch = utils.union(firstMatch, secondMatch)
                 if (intersectMatch.length > 0) {
                     haveChecked[i] = true
                     haveChecked[j] = true
@@ -669,6 +666,9 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                     } else {
                         matchTypes.push(new MatchType(unionMatch, intersectMatch[0]))
                     }
+                    unionMatch.forEach((tile: Tile) => {
+                        checkedTileList.push(tile)
+                    })
                     break
                 }
             }
@@ -676,23 +676,25 @@ export default class GameBoard extends Phaser.GameObjects.Container {
 
         for (let i = 0; i < matches.length; i++) {
             if (haveChecked[i]) continue
-            if (this.firstSelectedTile && matches[i].indexOf(this.firstSelectedTile) > -1) {
-                matchTypes.push(new MatchType(matches[i], this.firstSelectedTile))
-            } else if (
-                this.secondSelectedTile &&
-                matches[i].indexOf(this.secondSelectedTile) > -1
-            ) {
-                matchTypes.push(new MatchType(matches[i], this.secondSelectedTile))
+            const match = utils.difference(matches[i], checkedTileList)
+            if (match.length < 3) continue
+            if (this.firstSelectedTile && match.indexOf(this.firstSelectedTile) > -1) {
+                matchTypes.push(new MatchType(match, this.firstSelectedTile))
+            } else if (this.secondSelectedTile && match.indexOf(this.secondSelectedTile) > -1) {
+                matchTypes.push(new MatchType(match, this.secondSelectedTile))
             } else {
-                const len: number = matches[i].length
-                matchTypes.push(new MatchType(matches[i], matches[i][Math.floor(len / 2)]))
+                const len: number = match.length
+                matchTypes.push(new MatchType(match, match[Math.floor(len / 2)]))
             }
+            match.forEach((tile: Tile) => {
+                checkedTileList.push(tile)
+            })
         }
 
         return matchTypes
     }
 
-    public displayHint(): void {
+    public displayHint(): boolean {
         let flag: boolean = false
         for (let i = 0; i < this.tileGrid.length; i++) {
             for (let j = 0; j < this.tileGrid[0].length; j++) {
@@ -728,6 +730,7 @@ export default class GameBoard extends Phaser.GameObjects.Container {
             }
             if (flag) break
         }
+        return flag
     }
 
     public doHintSwap(x1: number, y1: number, x2: number, y2: number) {
@@ -814,10 +817,12 @@ export default class GameBoard extends Phaser.GameObjects.Container {
 
     public update(time: number, timeInterval: number) {
         if (this.idlingTime > 5000) {
-            console.log('idling')
             this.idlingTime = 0
-            this.displayHint()
-            this.doIdling()
+            if (!this.displayHint()) {
+                this.restart()
+            } else {
+                this.doIdling()
+            }
         } else {
             this.idlingTime += timeInterval
         }
@@ -825,7 +830,10 @@ export default class GameBoard extends Phaser.GameObjects.Container {
 
     private doExplosion(promises: Promise<void>[], tile: Tile): void {
         this.idlingTime = 0
-        if (tile.getExplostionType() == consts.MATCH_TYPES[1]) {
+        if (
+            tile.getExplostionType() == consts.MATCH_TYPES[1] ||
+            tile.getExplostionType() == consts.MATCH_TYPES[2]
+        ) {
             this.doMatchFourExplosion(promises, tile)
         } else {
             this.doMatchFiveExplosion(promises, tile)
@@ -834,17 +842,26 @@ export default class GameBoard extends Phaser.GameObjects.Container {
 
     private doMatchFourExplosion(promises: Promise<void>[], tile: Tile): void {
         this.idlingTime = 0
+        const tileI = utils.y2i(tile.y)
+        const tileJ = utils.x2j(tile.x)
 
-        // Do same tiles explosion
-        for (let i = 0; i < consts.GRID_HEIGHT; i++) {
+        // Do horizontal explosion
+        if (tile.getExplostionType() == consts.MATCH_TYPES[1]) {
             for (let j = 0; j < consts.GRID_WIDTH; j++) {
-                if (this.tileGrid[i][j].texture == tile.texture) {
-                    promises.push(
-                        this.tileGrid[i][j].doDestroyEffect(() => {
-                            this.haveTile[i][j] = false
-                        })
-                    )
-                }
+                promises.push(
+                    this.tileGrid[tileI][j].doDestroyEffect(() => {
+                        this.haveTile[tileI][j] = false
+                    }, utils.explostionDelay(tile, this.tileGrid[tileI][j]))
+                )
+            }
+        } // Do vertical explosion
+        else if (tile.getExplostionType() == consts.MATCH_TYPES[2]) {
+            for (let i = 0; i < consts.GRID_HEIGHT; i++) {
+                promises.push(
+                    this.tileGrid[i][tileJ].doDestroyEffect(() => {
+                        this.haveTile[i][tileJ] = false
+                    }, utils.explostionDelay(tile, this.tileGrid[i][tileJ]))
+                )
             }
         }
     }
@@ -854,26 +871,20 @@ export default class GameBoard extends Phaser.GameObjects.Container {
         const tileI = utils.y2i(tile.y)
         const tileJ = utils.x2j(tile.x)
 
-        // Do horizontal explosion
-        if (tile.getExplostionType() == consts.MATCH_TYPES[2]) {
-            for (let j = 0; j < consts.GRID_WIDTH; j++) {
-                promises.push(
-                    this.tileGrid[tileI][j].doDestroyEffect(() => {
-                        this.haveTile[tileI][j] = false
-                    })
-                )
-            }
-        } // Do vertical explosion
-        else if (tile.getExplostionType() == consts.MATCH_TYPES[3]) {
+        // Do same tiles explosion
+        if (tile.getExplostionType() == consts.MATCH_TYPES[3]) {
             for (let i = 0; i < consts.GRID_HEIGHT; i++) {
-                promises.push(
-                    this.tileGrid[i][tileJ].doDestroyEffect(() => {
-                        this.haveTile[i][tileJ] = false
-                    })
-                )
+                for (let j = 0; j < consts.GRID_WIDTH; j++) {
+                    if (this.tileGrid[i][j].texture == tile.texture) {
+                        promises.push(
+                            this.tileGrid[i][j].doDestroyEffect(() => {
+                                this.haveTile[i][j] = false
+                            })
+                        )
+                    }
+                }
             }
-        } // Do 3x3 explosion
-        else if (tile.getExplostionType() == consts.MATCH_TYPES[4]) {
+        } else if (tile.getExplostionType() == consts.MATCH_TYPES[4]) {
             for (let i = tileI - 1; i <= tileI + 1; i++) {
                 for (let j = tileJ - 1; j <= tileJ + 1; j++) {
                     if (i >= 0 && i < consts.GRID_WIDTH && j >= 0 && j < consts.GRID_WIDTH) {

@@ -1,6 +1,5 @@
 import consts from '../consts/consts'
-import LeftParticle from '../objects/LeftParticle'
-import RightParticle from '../objects/RightParticle'
+import ConfettiManager from '../objects/confetti/ConfettiManager'
 import GameplayScene from './GameplayScene'
 
 export default class AchievementScene extends Phaser.Scene {
@@ -8,8 +7,8 @@ export default class AchievementScene extends Phaser.Scene {
     private achievementWord: Phaser.GameObjects.Text
     private milestoneScore: Phaser.GameObjects.Text
 
-    private leftConfetti: Phaser.GameObjects.Particles.ParticleEmitter
-    private rightConfetti: Phaser.GameObjects.Particles.ParticleEmitter
+    private leftConfetti: ConfettiManager
+    private rightConfetti: ConfettiManager
 
     private onWaiting: boolean
     private waitingTime: number
@@ -46,8 +45,11 @@ export default class AchievementScene extends Phaser.Scene {
             .setVisible(false)
 
         this.scene.get('gameplay').events.on('milestoneachieved', (milestoneId: number) => {
+            this.sound.play('victory')
             this.onWaiting = true
-            this.doConfetti(500)
+            setTimeout(() => {
+                this.doConfetti()
+            }, 500)
             this.dropMilestoneBoard(milestoneId)
             const gameplayScene = this.scene.get('gameplay')
             if (gameplayScene instanceof GameplayScene) {
@@ -93,34 +95,11 @@ export default class AchievementScene extends Phaser.Scene {
         }
     }
 
-    private doConfetti(delay: number): void {
-        this.leftConfetti = this.add.particles(-50, 900, 'leaf-particle', {
-            particleClass: LeftParticle,
-            delay: delay,
-            lifespan: 2000,
-            angle: { min: -120, max: -30 },
-            speed: { min: 1500, max: 2500 },
-            rotate: { min: 0, max: 360 },
-            gravityY: 3000,
-            gravityX: -3000,
-            scale: { start: 0.8, end: 0 },
-            emitting: false,
-        })
-        this.leftConfetti.explode(100)
-
-        this.rightConfetti = this.add.particles(850, 900, 'leaf-particle', {
-            particleClass: RightParticle,
-            delay: delay,
-            lifespan: 2000,
-            angle: { min: 210, max: 300 },
-            speed: { min: -2500, max: -1500 },
-            rotate: { min: 0, max: 360 },
-            gravityY: 3000,
-            gravityX: 3000,
-            scale: { start: 0.8, end: 0 },
-            emitting: false,
-        })
-        this.rightConfetti.explode(100)
+    private doConfetti(): void {
+        this.leftConfetti = new ConfettiManager(this, -120, -30, true)
+        this.rightConfetti = new ConfettiManager(this, 210, 300, false)
+        this.leftConfetti.burst(-50, 900)
+        this.rightConfetti.burst(850, 900)
     }
 
     private dropMilestoneBoard(milestoneId: number): void {

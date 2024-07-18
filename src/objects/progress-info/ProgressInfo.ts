@@ -30,7 +30,6 @@ export default class ProgressBar extends Phaser.GameObjects.Container {
         this.add(this.progressHead)
         this.add(this.progressTail)
         this.add(this.progressBody)
-        // this.add(this.progressParticleEmitter)
         this.add(this.progressScoreFrame)
         this.add(this.progressScore)
         this.add(this.milestoneBoard)
@@ -55,7 +54,6 @@ export default class ProgressBar extends Phaser.GameObjects.Container {
                 duration: 200,
                 onUpdate: () => {
                     this.progressTail.setX(15 + this.progressBody.displayWidth)
-                    // this.progressParticleEmitter.setX(26 + this.progressBody.displayWidth)
                     this.setDisplayProgressScore(this.currentScore)
                 },
                 onComplete: () => {
@@ -74,15 +72,6 @@ export default class ProgressBar extends Phaser.GameObjects.Container {
             .image(16, 140, 'progress-body')
             .setScale(0, 1)
             .setOrigin(0)
-        // this.progressParticleEmitter = this.scene.add.particles(24, 0, 'smoke-particle', {
-        //     y: { min: 145, max: 177 },
-        //     lifespan: 200,
-        //     speed: { min: 100, max: 150 },
-        //     angle: { min: 100, max: 250 },
-        //     scale: { start: 0.8, end: 0 },
-        //     gravityY: 150,
-        //     blendMode: 'ADD',
-        // })
         this.progressScoreFrame = this.scene.add.image(100, 220, 'progress-score').setOrigin(0)
         this.progressScore = this.scene.add.text(120, 230, String(this.currentScore), {
             fontFamily: 'garamond',
@@ -123,7 +112,6 @@ export default class ProgressBar extends Phaser.GameObjects.Container {
             duration: 1000,
             onUpdate: () => {
                 this.progressTail.setX(15 + this.progressBody.displayWidth)
-                // this.progressParticleEmitter.setX(26 + this.progressBody.displayWidth)
                 this.setDisplayProgressScore(Math.floor((this.scaleX / 2.085) * this.currentScore))
                 this.currentScore = Math.floor((this.scaleX / 2.085) * this.currentScore)
             },
