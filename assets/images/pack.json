@@ -1,0 +1,96 @@
+{
+  "preload": {
+    "files": [
+      {
+        "type": "image",
+        "key": "gem-1",
+        "url": "./assets/images/gems/gem-1.png"
+      },
+      {
+        "type": "image",
+        "key": "gem-2",
+        "url": "./assets/images/gems/gem-2.png"
+      },
+      {
+        "type": "image",
+        "key": "gem-3",
+        "url": "./assets/images/gems/gem-3.png"
+      },
+      {
+        "type": "image",
+        "key": "gem-4",
+        "url": "./assets/images/gems/gem-4.png"
+      },
+      {
+        "type": "image",
+        "key": "gem-5",
+        "url": "./assets/images/gems/gem-5.png"
+      },
+      {
+        "type": "image",
+        "key": "gem-6",
+        "url": "./assets/images/gems/gem-6.png"
+      },
+      {
+        "type": "image",
+        "key": "gem-7",
+        "url": "./assets/images/gems/gem-7.png"
+      },
+      {
+        "type": "image",
+        "key": "ground",
+        "url": "./assets/images/grounds/ground.png"
+      },
+      {
+        "type": "image",
+        "key": "selection",
+        "url": "./assets/images/selection-frames/selection-frame.png"
+      },
+      {
+        "type": "image",
+        "key": "particle",
+        "url": "./assets/images/particles/particle-1.png"
+      },
+      {
+        "type": "image",
+        "key": "leaf-particle",
+        "url": "./assets/images/particles/particle-5.png"
+      },
+      {
+        "type": "image",
+        "key": "progress-frame",
+        "url": "./assets/images/progress-info/progress-frame.png"
+      },
+      {
+        "type": "image",
+        "key": "progress-body",
+        "url": "./assets/images/progress-info/progress-body.png"
+      },
+      {
+        "type": "image",
+        "key": "progress-head",
+        "url": "./assets/images/progress-info/progress-head.png"
+      },
+      {
+        "type": "image",
+        "key": "progress-tail",
+        "url": "./assets/images/progress-info/progress-tail.png"
+      },
+      {
+        "type": "image",
+        "key": "progress-milestone",
+        "url": "./assets/images/progress-info/progress-milestone.png"
+      },
+      {
+        "type": "image",
+        "key": "progress-score",
+        "url": "./assets/images/progress-info/progress-score.png"
+      },
+      {
+        "type": "image",
+        "key": "progress-achievement",
+        "url": "./assets/images/progress-info/progress-achievement.png"
+      }
+    ]
+  }
+}
