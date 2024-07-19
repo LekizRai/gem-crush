@@ -2,7 +2,6 @@
 - Add consts to consts.ts file
 - Normalize grid height, not using grid length
 - Using global emitter
-- Shuffle shape change
 - Drag inputs
 */
 

@@ -4,6 +4,8 @@ import Tile from '../tiles/Tile'
 import TileFactory from '../tiles/TileFactory'
 import MatchType from '../matches/MatchType'
 
+type Shape = Phaser.Geom.Triangle | Phaser.Geom.Circle | Phaser.Geom.Rectangle
+
 export default class GameBoard extends Phaser.GameObjects.Container {
     private tileGrid: Tile[][]
     private haveTile: boolean[][]
@@ -26,11 +28,14 @@ export default class GameBoard extends Phaser.GameObjects.Container {
 
     private haveSpecialTile: boolean
 
+    private isDown: boolean
+
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y)
         scene.add.existing(this)
 
-        this.scene.input.on('gameobjectdown', this.click, this)
+        this.scene.input.on('gameobjectdown', this.down, this)
+        this.scene.input.on('pointerup', this.up, this)
         this.scene.input.on('gameobjectover', this.over, this)
         this.scene.input.on('gameobjectout', this.out, this)
 
@@ -91,6 +96,8 @@ export default class GameBoard extends Phaser.GameObjects.Container {
         for (let i: number = 0; i < 8; i++) {
             this.emptiesInColumn.push(0)
         }
+
+        this.isDown = false
     }
 
     public finish(): void {
@@ -141,7 +148,8 @@ export default class GameBoard extends Phaser.GameObjects.Container {
         }
     }
 
-    private async click(pointer: Phaser.Input.Pointer, tile: Tile): Promise<void> {
+    private async down(pointer: Phaser.Input.Pointer, tile: Tile): Promise<void> {
+        this.isDown = true
         if (!this.onSwapping) {
             this.reset()
             if (!this.firstSelectedTile) {
@@ -179,9 +187,42 @@ export default class GameBoard extends Phaser.GameObjects.Container {
         }
     }
 
-    private over(pointer: Phaser.Input.Pointer, tile: Tile): void {
+    private up(pointer: Phaser.Input.Pointer): void {
+        this.isDown = false
+    }
+
+    private async over(pointer: Phaser.Input.Pointer, tile: Tile): Promise<void> {
         if (!this.onSwapping) {
-            if (tile != this.firstSelectedTile) {
+            if (this.isDown) {
+                if (this.firstSelectedTile) {
+                    if (this.firstSelectedTile != tile) {
+                        this.firstSelectionFrame.setVisible(false)
+                        this.secondSelectedTile = tile
+
+                        const dx = Math.floor(
+                            Math.abs(this.firstSelectedTile.x - this.secondSelectedTile.x) /
+                                consts.TILE_WIDTH
+                        )
+                        const dy = Math.floor(
+                            Math.abs(this.firstSelectedTile.y - this.secondSelectedTile.y) /
+                                consts.TILE_HEIGHT
+                        )
+                        if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
+                            this.onSwapping = true
+                            await this.swapTiles()
+                            this.firstSelectedTile = undefined
+                        } else {
+                            this.firstSelectionFrame.setVisible(true)
+                            this.firstSelectionFrame.setPosition(tile.x, tile.y)
+                            this.firstSelectedTile = tile
+                        }
+                    } else {
+                        this.firstSelectionFrame.setVisible(true)
+                        this.firstSelectionFrame.setPosition(tile.x, tile.y)
+                        this.firstSelectedTile = tile
+                    }
+                }
+            } else if (tile != this.firstSelectedTile) {
                 this.scene.add.tween({
                     targets: tile,
                     scale: 1.2,
@@ -520,22 +561,39 @@ export default class GameBoard extends Phaser.GameObjects.Container {
         }
         tileList = utils.shuffle(tileList)
 
-        const circle = new Phaser.Geom.Circle(346, 346, 64)
-
-        Phaser.Actions.PlaceOnCircle(tileList, circle)
+        const shapeType = Phaser.Math.RND.between(1, 3)
+        let shape: Shape
+        let step: number = 0
+        let previousTime: number = window.performance.now()
+        if (shapeType == 1) {
+            shape = new Phaser.Geom.Triangle(346, 150, 100, 520, 592, 520)
+        } else if (shapeType == 2) {
+            shape = new Phaser.Geom.Circle(346, 346, 246)
+        } else {
+            shape = new Phaser.Geom.Rectangle(121, 121, 450, 450)
+        }
+        this.placeOnShape(tileList, shape)
 
         this.scene.tweens.add({
-            targets: circle,
-            radius: 228,
+            targets: shape,
+            scale: 1,
             ease: 'Quintic.easeInOut',
             duration: 2000,
-            onUpdate: function () {
-                Phaser.Actions.RotateAroundDistance(
-                    tileList,
-                    { x: 346, y: 346 },
-                    0.1,
-                    circle.radius
-                )
+            onUpdate: () => {
+                const currentTime = window.performance.now()
+                const timeInterval = currentTime - previousTime
+                previousTime = currentTime
+
+                if (step + timeInterval > 15) {
+                    step = 0
+                    const firstTile = tileList.shift()
+                    if (firstTile) {
+                        tileList.push(firstTile)
+                        this.placeOnShape(tileList, shape)
+                    }
+                } else {
+                    step += timeInterval
+                }
             },
             onComplete: () => {
                 for (let i = 0; i < this.tileGrid.length; i++) {
@@ -557,6 +615,16 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                 }
             },
         })
+    }
+
+    private placeOnShape(tileList: Tile[], shape: Shape): void {
+        if (shape instanceof Phaser.Geom.Triangle) {
+            Phaser.Actions.PlaceOnTriangle(tileList, shape)
+        } else if (shape instanceof Phaser.Geom.Circle) {
+            Phaser.Actions.PlaceOnCircle(tileList, shape)
+        } else if (shape instanceof Phaser.Geom.Rectangle) {
+            Phaser.Actions.PlaceOnRectangle(tileList, shape)
+        }
     }
 
     private getMatches(tileGrid: Tile[][]): MatchType[] {

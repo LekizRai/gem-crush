@@ -96,8 +96,8 @@ export default class AchievementScene extends Phaser.Scene {
     }
 
     private doConfetti(): void {
-        this.leftConfetti = new ConfettiManager(this, -120, -30, true)
-        this.rightConfetti = new ConfettiManager(this, 210, 300, false)
+        this.leftConfetti = new ConfettiManager(this, -120, -30)
+        this.rightConfetti = new ConfettiManager(this, 210, 300)
         this.leftConfetti.burst(-50, 900)
         this.rightConfetti.burst(850, 900)
     }
