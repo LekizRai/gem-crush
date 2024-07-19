@@ -73,7 +73,7 @@ export default class Tile extends Phaser.GameObjects.Image {
                         x: x,
                         y: y,
                         scale: 0,
-                        duration: 400,
+                        duration: 500,
                         delay: delay,
                         ease: Phaser.Math.Easing.Expo.Out,
                         repeat: 0,
@@ -95,7 +95,7 @@ export default class Tile extends Phaser.GameObjects.Image {
                 this.scene.add.tween({
                     targets: this,
                     scale: 0,
-                    duration: 400,
+                    duration: 500,
                     delay: delay,
                     ease: Phaser.Math.Easing.Expo.Out,
                     repeat: 0,

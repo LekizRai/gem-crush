@@ -405,7 +405,7 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                 targets: target,
                 y: utils.i2y(i),
                 ease: Phaser.Math.Easing.Bounce.Out,
-                duration: (2000 * this.emptiesInColumn[j]) / 8,
+                duration: (1000 * this.emptiesInColumn[j]) / 8,
                 repeat: 0,
                 yoyo: false,
                 onComplete: () => {
@@ -587,7 +587,7 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                 const timeInterval = currentTime - previousTime
                 previousTime = currentTime
 
-                if (step + timeInterval > 25) {
+                if (step + timeInterval > 15) {
                     step = 0
                     const firstTile = tileList.shift()
                     if (firstTile) {
@@ -606,7 +606,8 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                             targets: tileList[i * this.tileGrid.length + j],
                             x: this.tilePosition[i][j].x,
                             y: this.tilePosition[i][j].y,
-                            duration: 1000,
+                            duration: 700,
+                            delay: 200,
                             onComplete: () => {
                                 count--
                                 if (count == 0) {
@@ -857,28 +858,20 @@ export default class GameBoard extends Phaser.GameObjects.Container {
     }
 
     private doIdling(): void {
+        const idlingStyle = Phaser.Math.RND.between(1, 2)
         for (let i = 0; i < consts.GRID_WIDTH; i++) {
             for (let j = 0; j < consts.GRID_HEIGHT; j++) {
                 this.scene.add.tween({
-                    targets: this.tileGrid[i][j],
-                    y: this.tileGrid[i][j].y - 10,
-                    ease: Phaser.Math.Easing.Cubic.InOut,
-                    duration: 400,
-                    delay: j * 20,
+                    targets: this.groundGrid[i][j],
+                    y: this.groundGrid[i][j].y + 10,
+                    alpha: 0.2,
+                    // angle: 10,
+                    duration: 200,
+                    delay: idlingStyle == 1 ? (i + j) * 100 : j * 150,
                     yoyo: true,
                     repeat: 0,
                     onComplete: () => {
-                        this.scene.add.tween({
-                            targets: this.tileGrid[i][j],
-                            y: this.tileGrid[i][j].y + 10,
-                            ease: Phaser.Math.Easing.Cubic.InOut,
-                            duration: 400,
-                            yoyo: true,
-                            repeat: 0,
-                            onComplete: () => {
-                                this.idlingTime = 0
-                            },
-                        })
+                        this.idlingTime = 0
                     },
                 })
             }
