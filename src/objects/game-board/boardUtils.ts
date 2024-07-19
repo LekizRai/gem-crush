@@ -35,7 +35,7 @@ const utils = {
     explostionDelay: (tile1: Tile, tile2: Tile) => {
         const distanceX = Math.abs(tile1.x - tile2.x)
         const distanceY = Math.abs(tile1.y - tile2.y)
-        return Math.max(distanceX, distanceY) * 0.8
+        return Math.max(distanceX, distanceY) * 1.2
     }
 }
 

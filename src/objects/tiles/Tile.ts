@@ -73,11 +73,9 @@ export default class Tile extends Phaser.GameObjects.Image {
                         x: x,
                         y: y,
                         scale: 0,
-                        duration: 200,
+                        duration: 400,
                         delay: delay,
-                        ease: (k: number) => {
-                            return Phaser.Math.Easing.Cubic.In(k)
-                        },
+                        ease: Phaser.Math.Easing.Expo.Out,
                         repeat: 0,
                         onComplete: () => {
                             if (this.active) {
@@ -97,11 +95,9 @@ export default class Tile extends Phaser.GameObjects.Image {
                 this.scene.add.tween({
                     targets: this,
                     scale: 0,
-                    duration: 200,
+                    duration: 400,
                     delay: delay,
-                    ease: (k: number) => {
-                        return Phaser.Math.Easing.Cubic.In(k)
-                    },
+                    ease: Phaser.Math.Easing.Expo.Out,
                     repeat: 0,
                     onComplete: () => {
                         if (this.active) {

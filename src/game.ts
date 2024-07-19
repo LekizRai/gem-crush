@@ -2,7 +2,7 @@
 - Add consts to consts.ts file
 - Normalize grid height, not using grid length
 - Using global emitter
-- Drag inputs
+- Spiral explosionin 3x3 explosion
 */
 
 import Phaser from 'phaser'

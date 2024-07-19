@@ -7,6 +7,7 @@ import MatchType from '../matches/MatchType'
 type Shape = Phaser.Geom.Triangle | Phaser.Geom.Circle | Phaser.Geom.Rectangle
 
 export default class GameBoard extends Phaser.GameObjects.Container {
+    private groundGrid: Phaser.GameObjects.Image[][]
     private tileGrid: Tile[][]
     private haveTile: boolean[][]
     private tilePosition: { x: number; y: number }[][]
@@ -41,16 +42,18 @@ export default class GameBoard extends Phaser.GameObjects.Container {
 
         this.tileFactory = new TileFactory(scene)
 
+        this.groundGrid = []
         this.tileGrid = []
         this.haveTile = []
         this.tilePosition = []
         for (let i = 0; i < consts.GRID_HEIGHT; i++) {
+            this.groundGrid[i] = []
             this.tileGrid[i] = []
             this.haveTile[i] = []
             this.tilePosition[i] = []
             for (let j = 0; j < consts.GRID_WIDTH; j++) {
-                const ground = this.scene.add.image(utils.j2x(j), utils.i2y(i), 'ground')
-                this.add(ground)
+                this.groundGrid[i][j] = this.scene.add.image(utils.j2x(j), utils.i2y(i), 'ground')
+                this.add(this.groundGrid[i][j])
             }
         }
 
@@ -252,7 +255,8 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                     targets: this.firstSelectedTile,
                     x: this.secondSelectedTile?.x,
                     y: this.secondSelectedTile?.y,
-                    duration: 100,
+                    duration: 200,
+                    ease: Phaser.Math.Easing.Cubic.InOut,
                     repeat: 0,
                     yoyo: false,
                     onComplete: () => {
@@ -268,7 +272,8 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                     targets: this.secondSelectedTile,
                     x: this.firstSelectedTile?.x,
                     y: this.firstSelectedTile?.y,
-                    duration: 100,
+                    duration: 200,
+                    ease: Phaser.Math.Easing.Cubic.InOut,
                     repeat: 0,
                     yoyo: false,
                     onComplete: () => {
@@ -399,10 +404,8 @@ export default class GameBoard extends Phaser.GameObjects.Container {
             this.scene.add.tween({
                 targets: target,
                 y: utils.i2y(i),
-                ease: (k: number) => {
-                    return Phaser.Math.Easing.Cubic.In(k)
-                },
-                duration: (1000 * this.emptiesInColumn[j]) / 8,
+                ease: Phaser.Math.Easing.Bounce.Out,
+                duration: (2000 * this.emptiesInColumn[j]) / 8,
                 repeat: 0,
                 yoyo: false,
                 onComplete: () => {
@@ -522,6 +525,7 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                 // Case explosion 4 - 5 special tiles
                 case consts.MATCH_TYPES[4]: {
                     const mergedIntoTile: Tile = matchTypes[i].getMergedIntoTile()
+                    mergedIntoTile.setTileTexture(6)
                     matchTypes[i].getTileList().forEach((tile: Tile) => {
                         const tileI = utils.y2i(tile.y)
                         const tileJ = utils.x2j(tile.x)
@@ -538,7 +542,6 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                             )
                         } else {
                             mergedIntoTile.setExplosionType(matchTypes[i].getMatchType())
-                            mergedIntoTile.setTileTexture(6)
                             mergedIntoTile.addGlow(0xffffff)
                         }
                     })
@@ -584,7 +587,7 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                 const timeInterval = currentTime - previousTime
                 previousTime = currentTime
 
-                if (step + timeInterval > 15) {
+                if (step + timeInterval > 25) {
                     step = 0
                     const firstTile = tileList.shift()
                     if (firstTile) {
@@ -603,7 +606,7 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                             targets: tileList[i * this.tileGrid.length + j],
                             x: this.tilePosition[i][j].x,
                             y: this.tilePosition[i][j].y,
-                            duration: 500,
+                            duration: 1000,
                             onComplete: () => {
                                 count--
                                 if (count == 0) {
@@ -854,8 +857,8 @@ export default class GameBoard extends Phaser.GameObjects.Container {
     }
 
     private doIdling(): void {
-        for (let i = 0; i < this.tileGrid.length; i++) {
-            for (let j = 0; j < this.tileGrid[i].length; j++) {
+        for (let i = 0; i < consts.GRID_WIDTH; i++) {
+            for (let j = 0; j < consts.GRID_HEIGHT; j++) {
                 this.scene.add.tween({
                     targets: this.tileGrid[i][j],
                     y: this.tileGrid[i][j].y - 10,
@@ -870,7 +873,6 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                             y: this.tileGrid[i][j].y + 10,
                             ease: Phaser.Math.Easing.Cubic.InOut,
                             duration: 400,
-                            delay: j * 20,
                             yoyo: true,
                             repeat: 0,
                             onComplete: () => {
