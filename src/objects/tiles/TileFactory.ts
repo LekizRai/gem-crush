@@ -19,7 +19,7 @@ export default class TileFactory {
  
     public createRandomTile(x: number, y: number): Tile {
         const tileType: string =
-            consts.TILE_TYPES[Phaser.Math.RND.between(0, consts.TILE_TYPES.length - 4)]
+            consts.TILE_TYPES[Phaser.Math.RND.between(0, consts.TILE_TYPES.length - 2)]
 
         return new Tile({
             scene: this.scene,

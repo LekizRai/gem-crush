@@ -60,7 +60,7 @@ export default class GameBoard extends Phaser.GameObjects.Container {
         for (let i = 0; i < consts.GRID_HEIGHT; i++) {
             for (let j = 0; j < consts.GRID_WIDTH; j++) {
                 this.tilePosition[i][j] = { x: utils.j2x(j), y: utils.i2y(i) }
-                this.tileGrid[i][j] = this.tileFactory.createRandomTile(utils.j2x(j), utils.i2y(i))
+                this.tileGrid[i][j] = this.tileFactory.createRandomTile(346, 346)
                 this.haveTile[i][j] = true
                 this.add(this.tileGrid[i][j])
             }
@@ -129,7 +129,7 @@ export default class GameBoard extends Phaser.GameObjects.Container {
         for (let i = 0; i < consts.GRID_HEIGHT; i++) {
             for (let j = 0; j < consts.GRID_WIDTH; j++) {
                 this.tilePosition[i][j] = { x: utils.j2x(j), y: utils.i2y(i) }
-                this.tileGrid[i][j] = this.tileFactory.createRandomTile(utils.j2x(j), utils.i2y(i))
+                this.tileGrid[i][j] = this.tileFactory.createRandomTile(346, 346)
                 this.haveTile[i][j] = true
                 this.add(this.tileGrid[i][j])
             }
@@ -403,7 +403,7 @@ export default class GameBoard extends Phaser.GameObjects.Container {
             this.scene.add.tween({
                 targets: target,
                 y: utils.i2y(i),
-                ease: Phaser.Math.Easing.Quadratic.Out,
+                ease: Phaser.Math.Easing.Cubic.Out,
                 duration: (1000 * this.emptiesInColumn[j]) / 8,
                 repeat: 0,
                 yoyo: false,
@@ -556,12 +556,62 @@ export default class GameBoard extends Phaser.GameObjects.Container {
         this.idlingTime = 0
         let count = 64
         let tileList: Tile[] = []
+        let substituteList: Phaser.GameObjects.Image[] = []
         for (let i = 0; i < this.tileGrid.length; i++) {
             for (let j = 0; j < this.tileGrid[0].length; j++) {
                 tileList.push(this.tileGrid[i][j])
+                substituteList.push(new Phaser.GameObjects.Image(this.scene, 0, 0, ''))
             }
         }
         tileList = utils.shuffle(tileList)
+
+        const rotate = () => {
+            this.scene.tweens.add({
+                targets: shape,
+                scale: 1,
+                ease: 'Quintic.easeInOut',
+                duration: 2000,
+                delay: 100,
+                onUpdate: () => {
+                    const currentTime = window.performance.now()
+                    const timeInterval = currentTime - previousTime
+                    previousTime = currentTime
+
+                    if (step + timeInterval > 15) {
+                        step = 0
+                        const firstTile = tileList.shift()
+                        if (firstTile) {
+                            tileList.push(firstTile)
+                            this.placeOnShape(tileList, shape)
+                        }
+                    } else {
+                        step += timeInterval
+                    }
+                },
+                onComplete: () => {
+                    this.idlingTime = 0
+                    for (let i = 0; i < this.tileGrid.length; i++) {
+                        for (let j = 0; j < this.tileGrid[0].length; j++) {
+                            this.tileGrid[i][j] = tileList[i * this.tileGrid.length + j]
+                            this.scene.add.tween({
+                                targets: tileList[i * this.tileGrid.length + j],
+                                x: this.tilePosition[i][j].x,
+                                y: this.tilePosition[i][j].y,
+                                duration: 700,
+                                delay: (i * 8 + j) * 10 + 100,
+                                onComplete: () => {
+                                    this.idlingTime = 0
+                                    count--
+                                    if (count == 0) {
+                                        this.checkMatches()
+                                    }
+                                },
+                            })
+                        }
+                    }
+                },
+            })
+        }
 
         const shapeType = Phaser.Math.RND.between(1, 3)
         let shape: Shape
@@ -574,59 +624,36 @@ export default class GameBoard extends Phaser.GameObjects.Container {
         } else {
             shape = new Phaser.Geom.Rectangle(121, 121, 450, 450)
         }
-        this.placeOnShape(tileList, shape)
+        this.placeOnShape(substituteList, shape)
 
-        this.scene.tweens.add({
-            targets: shape,
-            scale: 1,
-            ease: 'Quintic.easeInOut',
-            duration: 2000,
-            onUpdate: () => {
-                const currentTime = window.performance.now()
-                const timeInterval = currentTime - previousTime
-                previousTime = currentTime
-
-                if (step + timeInterval > 15) {
-                    step = 0
-                    const firstTile = tileList.shift()
-                    if (firstTile) {
-                        tileList.push(firstTile)
-                        this.placeOnShape(tileList, shape)
-                    }
-                } else {
-                    step += timeInterval
-                }
-            },
-            onComplete: () => {
-                for (let i = 0; i < this.tileGrid.length; i++) {
-                    for (let j = 0; j < this.tileGrid[0].length; j++) {
-                        this.tileGrid[i][j] = tileList[i * this.tileGrid.length + j]
-                        this.scene.add.tween({
-                            targets: tileList[i * this.tileGrid.length + j],
-                            x: this.tilePosition[i][j].x,
-                            y: this.tilePosition[i][j].y,
-                            duration: 700,
-                            delay: 200,
-                            onComplete: () => {
-                                count--
-                                if (count == 0) {
-                                    this.checkMatches()
-                                }
-                            },
-                        })
-                    }
-                }
-            },
-        })
+        for (let i = 0; i < this.tileGrid.length; i++) {
+            for (let j = 0; j < this.tileGrid[0].length; j++) {
+                this.scene.tweens.add({
+                    targets: tileList[i * this.tileGrid.length + j],
+                    x: substituteList[i * this.tileGrid.length + j].x,
+                    y: substituteList[i * this.tileGrid.length + j].y,
+                    duration: 700,
+                    delay: (i * 8 + j) * 20,
+                    onComplete: () => {
+                        this.idlingTime = 0
+                        count--
+                        if (count == 0) {
+                            count = 64
+                            rotate()
+                        }
+                    },
+                })
+            }
+        }
     }
 
-    private placeOnShape(tileList: Tile[], shape: Shape): void {
+    private placeOnShape(objList: Phaser.GameObjects.GameObject[], shape: Shape): void {
         if (shape instanceof Phaser.Geom.Triangle) {
-            Phaser.Actions.PlaceOnTriangle(tileList, shape)
+            Phaser.Actions.PlaceOnTriangle(objList, shape)
         } else if (shape instanceof Phaser.Geom.Circle) {
-            Phaser.Actions.PlaceOnCircle(tileList, shape)
+            Phaser.Actions.PlaceOnCircle(objList, shape)
         } else if (shape instanceof Phaser.Geom.Rectangle) {
-            Phaser.Actions.PlaceOnRectangle(tileList, shape)
+            Phaser.Actions.PlaceOnRectangle(objList, shape)
         }
     }
 
