@@ -182,9 +182,8 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                         this.firstSelectedTile = tile
                     }
                 } else {
-                    this.firstSelectionFrame.setVisible(true)
-                    this.firstSelectionFrame.setPosition(tile.x, tile.y)
-                    this.firstSelectedTile = tile
+                    this.firstSelectionFrame.setVisible(false)
+                    this.firstSelectedTile = undefined
                 }
             }
         }
@@ -404,7 +403,7 @@ export default class GameBoard extends Phaser.GameObjects.Container {
             this.scene.add.tween({
                 targets: target,
                 y: utils.i2y(i),
-                ease: Phaser.Math.Easing.Bounce.Out,
+                ease: Phaser.Math.Easing.Quadratic.Out,
                 duration: (1000 * this.emptiesInColumn[j]) / 8,
                 repeat: 0,
                 yoyo: false,
@@ -865,7 +864,6 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                     targets: this.groundGrid[i][j],
                     y: this.groundGrid[i][j].y + 10,
                     alpha: 0.2,
-                    // angle: 10,
                     duration: 200,
                     delay: idlingStyle == 1 ? (i + j) * 100 : j * 150,
                     yoyo: true,
@@ -947,7 +945,8 @@ export default class GameBoard extends Phaser.GameObjects.Container {
                     }
                 }
             }
-        } else if (tile.getExplostionType() == consts.MATCH_TYPES[4]) {
+        } // Do 3x3 explosion
+        else if (tile.getExplostionType() == consts.MATCH_TYPES[4]) {
             for (let i = tileI - 1; i <= tileI + 1; i++) {
                 for (let j = tileJ - 1; j <= tileJ + 1; j++) {
                     if (i >= 0 && i < consts.GRID_WIDTH && j >= 0 && j < consts.GRID_WIDTH) {
