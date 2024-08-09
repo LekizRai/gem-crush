@@ -7,7 +7,7 @@ const consts = {
     TILE_HEIGHT: 64,
     TILE_TYPES: ['gem-1', 'gem-2', 'gem-3', 'gem-4', 'gem-5', 'gem-6', 'gem-7'],
     MATCH_TYPES: ['0', '4H', '4V', '5', '5S'],
-    MILESTONES: [10, 2000, 5000, 10000, 15000, 20000, 30000, 50000, 75000, 100000],
+    MILESTONES: [1000, 2000, 5000, 10000, 15000, 20000, 30000, 50000, 75000, 100000],
 }
 
 export default consts
